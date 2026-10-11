@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Edit Link</title>
+</head>
+<body>
+    <main class="page">
+        <nav class="navigation"><a href="{{ url_for('index') }}">My Links</a></nav>
+        <h1 class="page-title">Edit Link</h1>
+        <form class="link-form" action="{{ url_for('edit_link', link_id=link.id) }}" method="post">
+            <label for="name">Site name</label>
+            <input type="text" id="name" name="name" value="{{ link.name }}" required>
+            <label for="url">URL</label>
+            <input type="url" id="url" name="url" value="{{ link.url }}" required>
+            <button type="submit">Save Changes</button>
+        </form>
+    </main>
+</body>
+</html>

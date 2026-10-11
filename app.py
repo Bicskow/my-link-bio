@@ -37,6 +37,19 @@ def delete_link(link_id):
     abort(404)
 
 
+@app.route("/edit/<link_id>", methods=["GET", "POST"])
+def edit_link(link_id):
+    link = next((link for link in links if link["id"] == link_id), None)
+    if link is None:
+        abort(404)
+    if request.method == "POST":
+        name = request.form["name"]
+        url = request.form["url"]
+        link.update(name=name, url=url)
+        return redirect(url_for("index"))
+    return render_template("edit.html", link=link)
+
+
 @app.route("/about")
 def about():
     return render_template("about.html")

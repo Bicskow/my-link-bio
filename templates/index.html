@@ -21,6 +21,7 @@
             {% for link in links %}
             <li class="link-card">
                 <a class="card-link" href="{{ link.url }}">{{ link.name }}</a>
+                <a class="edit-button" href="{{ url_for('edit_link', link_id=link.id) }}" aria-label="Edit {{ link.name }}">Edit</a>
                 <form action="{{ url_for('delete_link', link_id=link.id) }}" method="post">
                     <button class="delete-button" type="submit" aria-label="Delete {{ link.name }}">Delete</button>
                 </form>
