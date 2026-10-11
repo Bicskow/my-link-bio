@@ -2,22 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <title>My Links</title>
 </head>
 <body>
-    <nav><a href="{{ url_for('about') }}">About</a></nav>
-    <h1>My Links</h1>
-    <form action="{{ url_for('add_link') }}" method="post">
-        <label for="name">Site name</label>
-        <input type="text" id="name" name="name" required>
-        <label for="url">URL</label>
-        <input type="url" id="url" name="url" required>
-        <button type="submit">Add Link</button>
-    </form>
-    <ul>
-        {% for link in links %}
-        <li><a href="{{ link.url }}">{{ link.name }}</a></li>
-        {% endfor %}
-    </ul>
+    <main class="page">
+        <nav class="navigation"><a href="{{ url_for('about') }}">About</a></nav>
+        <h1 class="page-title">My Links</h1>
+        <form class="link-form" action="{{ url_for('add_link') }}" method="post">
+            <label for="name">Site name</label>
+            <input type="text" id="name" name="name" required>
+            <label for="url">URL</label>
+            <input type="url" id="url" name="url" required>
+            <button type="submit">Add Link</button>
+        </form>
+        <ul class="link-list" aria-label="My links">
+            {% for link in links %}
+            <li><a class="link-card" href="{{ link.url }}">{{ link.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </main>
 </body>
 </html>
