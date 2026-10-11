@@ -1,16 +1,23 @@
-from flask import Flask, render_template
+from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
+
+links = [
+    {"name": "Google", "url": "https://www.google.com"},
+    {"name": "GitHub", "url": "https://github.com"},
+    {"name": "Wikipedia", "url": "https://www.wikipedia.org"},
+]
 
 
 @app.route("/")
 def index():
-    links = [
-        {"name": "Google", "url": "https://www.google.com"},
-        {"name": "GitHub", "url": "https://github.com"},
-        {"name": "Wikipedia", "url": "https://www.wikipedia.org"},
-    ]
     return render_template("index.html", links=links)
+
+
+@app.route("/add", methods=["POST"])
+def add_link():
+    links.append({"name": request.form["name"], "url": request.form["url"]})
+    return redirect(url_for("index"))
 
 
 @app.route("/about")
