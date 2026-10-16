@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+import requests
+from bs4 import BeautifulSoup
 from flask import Flask, abort, redirect, render_template, request, url_for
 
 app = Flask(__name__)
@@ -11,6 +13,27 @@ links = [
 ]
 for link in links:
     link["id"] = uuid4().hex
+    link.update(title="Not Available", description="Not Available", image_url="Not Available")
+
+
+def fetch_metadata(url):
+    metadata = dict.fromkeys(("title", "description", "image_url"), "Not Available")
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+    except requests.RequestException:
+        return metadata
+
+    soup = BeautifulSoup(response.content, "html.parser")
+    for field, property_name in (
+        ("title", "og:title"),
+        ("description", "og:description"),
+        ("image_url", "og:image"),
+    ):
+        tag = soup.find("meta", attrs={"property": property_name})
+        if tag and tag.get("content", "").strip():
+            metadata[field] = tag["content"].strip()
+    return metadata
 
 
 @app.route("/")
@@ -20,10 +43,13 @@ def index():
 
 @app.route("/add", methods=["POST"])
 def add_link():
+    name = request.form["name"]
+    url = request.form["url"]
     links.append({
         "id": uuid4().hex,
-        "name": request.form["name"],
-        "url": request.form["url"],
+        "name": name,
+        "url": url,
+        **fetch_metadata(url),
     })
     return redirect(url_for("index"))
 
@@ -45,6 +71,8 @@ def edit_link(link_id):
     if request.method == "POST":
         name = request.form["name"]
         url = request.form["url"]
+        if url != link["url"]:
+            link.update(fetch_metadata(url))
         link.update(name=name, url=url)
         return redirect(url_for("index"))
     return render_template("edit.html", link=link)

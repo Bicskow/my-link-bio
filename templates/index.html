@@ -25,6 +25,20 @@
                 <form action="{{ url_for('delete_link', link_id=link.id) }}" method="post">
                     <button class="delete-button" type="submit" aria-label="Delete {{ link.name }}">Delete</button>
                 </form>
+                <dl class="link-metadata">
+                    <div>
+                        <dt>Title</dt>
+                        <dd>{{ link.title }}</dd>
+                    </div>
+                    <div>
+                        <dt>Description</dt>
+                        <dd>{{ link.description }}</dd>
+                    </div>
+                    <div>
+                        <dt>Image URL</dt>
+                        <dd>{{ link.image_url }}</dd>
+                    </div>
+                </dl>
             </li>
             {% endfor %}
         </ul>

@@ -43,6 +43,18 @@
     .card-link {
         @apply min-w-0 flex-1 break-words rounded font-medium text-teal-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:ring-offset-2;
     }
+    .link-metadata {
+        @apply grid w-full min-w-0 gap-4 text-sm sm:grid-cols-3;
+    }
+    .link-metadata > div {
+        @apply min-w-0;
+    }
+    .link-metadata dt {
+        @apply mb-1 font-semibold text-slate-700;
+    }
+    .link-metadata dd {
+        @apply break-words text-slate-600;
+    }
     .delete-button {
         @apply rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2;
     }
