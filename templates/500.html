@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>500 — Internal Server Error</title>
+</head>
+<body>
+    <main class="page">
+        <h1 class="page-title">500 — Internal Server Error</h1>
+        <p class="about-text">Something went wrong. Please try again later.</p>
+        <nav class="navigation"><a href="{{ url_for('index') }}">Back to My Links</a></nav>
+    </main>
+</body>
+</html>

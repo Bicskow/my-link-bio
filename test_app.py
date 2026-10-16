@@ -103,5 +103,32 @@ class LinkMetadataTests(unittest.TestCase):
         get.assert_not_called()
 
 
+class ErrorPageTests(unittest.TestCase):
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_unknown_page_renders_custom_404(self):
+        response = self.client.get("/this-page-does-not-exist")
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("404 — Page Not Found", response.get_data(as_text=True))
+        self.assertIn('href="/"', response.get_data(as_text=True))
+
+    def test_missing_link_renders_custom_404(self):
+        response = self.client.get("/edit/nonexistent-id")
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("404 — Page Not Found", response.get_data(as_text=True))
+
+    def test_unhandled_exception_renders_custom_500(self):
+        with patch.dict(app.config, DEBUG=False, TESTING=False, PROPAGATE_EXCEPTIONS=False):
+            with patch.dict(app.view_functions, index=Mock(side_effect=RuntimeError("private error detail"))):
+                with self.assertLogs(app.logger, level="ERROR"):
+                    response = self.client.get("/")
+        self.assertEqual(response.status_code, 500)
+        html = response.get_data(as_text=True)
+        self.assertIn("500 — Internal Server Error", html)
+        self.assertIn('href="/"', html)
+        self.assertNotIn("private error detail", html)
+
+
 if __name__ == "__main__":
     unittest.main()
