@@ -33,11 +33,34 @@ class LinkMetadataTests(unittest.TestCase):
         self.assertEqual(links[-1]["description"], "A sample description")
         self.assertEqual(links[-1]["image_url"], "https://example.com/image.png")
         page = BeautifulSoup(self.client.get("/").data, "html.parser")
-        columns = page.select(".link-metadata")[-1]
-        self.assertEqual([tag.text for tag in columns.select("dt")],
-                         ["Title", "Description", "Image URL"])
-        self.assertEqual([tag.text for tag in columns.select("dd")],
-                         [links[-1][key] for key in ("title", "description", "image_url")])
+        card = page.select(".link-card")[-1]
+        self.assertEqual(card.select_one("img")["src"], links[-1]["image_url"])
+        self.assertEqual(card.select_one(".card-title").text, links[-1]["title"])
+        self.assertEqual(card.select_one(".card-description").text, links[-1]["description"])
+        self.assertEqual(card.select_one(".card-url")["href"], links[-1]["url"])
+        self.assertEqual(card.select_one(".card-url").text, links[-1]["url"])
+        self.assertEqual(card.find_all(recursive=False)[-1]["class"], ["card-link", "card-url"])
+
+    def test_unavailable_metadata_keeps_static_card(self):
+        page = BeautifulSoup(self.client.get("/").data, "html.parser")
+        card = page.select_one(".link-card")
+        self.assertIsNone(card.find("img"))
+        self.assertEqual(card.select_one(".card-link").text, links[0]["name"])
+        self.assertEqual([dd.text for dd in card.select("dd")], ["Not Available"] * 3)
+        self.assertIsNotNone(card.select_one(".edit-button"))
+        self.assertIsNotNone(card.select_one(".delete-button"))
+
+    def test_partial_metadata_does_not_render_placeholder_as_image(self):
+        links[0]["title"] = "A title"
+        for missing in ("Not Available", "", None):
+            with self.subTest(missing=missing):
+                links[0]["image_url"] = missing
+                page = BeautifulSoup(self.client.get("/").data, "html.parser")
+                card = page.select_one(".link-card")
+                self.assertIsNone(card.find("img"))
+                self.assertEqual(card.select_one(".card-title").text, "A title")
+                self.assertIn("Image: Not Available", card.text)
+                self.assertIsNotNone(card.select_one(".card-url"))
 
     @patch("app.requests.get")
     def test_missing_empty_and_contentless_tags_use_fallback(self, get):

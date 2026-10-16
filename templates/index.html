@@ -20,11 +20,27 @@
         <ul class="link-list" aria-label="My links">
             {% for link in links %}
             <li class="link-card">
+                {% set has_metadata = (link.title and link.title != 'Not Available') or (link.description and link.description != 'Not Available') or (link.image_url and link.image_url != 'Not Available') %}
+                {% if has_metadata %}
+                <div class="card-preview">
+                    {% if link.image_url and link.image_url != 'Not Available' %}
+                    <img class="card-image" src="{{ link.image_url }}" alt="Preview for {{ link.name }}" loading="lazy">
+                    {% else %}
+                    <p class="card-description">Image: Not Available</p>
+                    {% endif %}
+                    <h2 class="card-title">{{ link.title or 'Not Available' }}</h2>
+                    <p class="card-description">{{ link.description or 'Not Available' }}</p>
+                </div>
+                {% else %}
                 <a class="card-link" href="{{ link.url }}">{{ link.name }}</a>
+                {% endif %}
                 <a class="edit-button" href="{{ url_for('edit_link', link_id=link.id) }}" aria-label="Edit {{ link.name }}">Edit</a>
                 <form action="{{ url_for('delete_link', link_id=link.id) }}" method="post">
                     <button class="delete-button" type="submit" aria-label="Delete {{ link.name }}">Delete</button>
                 </form>
+                {% if has_metadata %}
+                <a class="card-link card-url" href="{{ link.url }}">{{ link.url }}</a>
+                {% else %}
                 <dl class="link-metadata">
                     <div>
                         <dt>Title</dt>
@@ -39,6 +55,7 @@
                         <dd>{{ link.image_url }}</dd>
                     </div>
                 </dl>
+                {% endif %}
             </li>
             {% endfor %}
         </ul>

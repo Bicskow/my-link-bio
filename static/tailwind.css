@@ -46,6 +46,21 @@
     .link-metadata {
         @apply grid w-full min-w-0 gap-4 text-sm sm:grid-cols-3;
     }
+    .card-preview {
+        @apply w-full min-w-0 space-y-3;
+    }
+    .card-image {
+        @apply max-h-72 w-full rounded-lg object-contain;
+    }
+    .card-title {
+        @apply break-words text-lg font-bold text-slate-900;
+    }
+    .card-description {
+        @apply break-words text-sm leading-relaxed text-slate-600;
+    }
+    .card-url {
+        @apply w-full flex-none text-sm;
+    }
     .link-metadata > div {
         @apply min-w-0;
     }
