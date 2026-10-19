@@ -8,7 +8,7 @@
 </head>
 <body>
     <main class="page">
-        <nav class="navigation"><a href="{{ url_for('about') }}">About</a></nav>
+        <nav class="navigation"><a href="{{ url_for('about') }}">About</a> | <a href="{{ url_for('contact') }}">Contact</a></nav>
         <h1 class="page-title">My Links</h1>
         <form class="link-form" action="{{ url_for('add_link') }}" method="post">
             <label for="name">Site name</label>

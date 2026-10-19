@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Contact</title>
+</head>
+<body>
+    <main class="page">
+        <nav class="navigation"><a href="{{ url_for('index') }}">My Links</a> | <a href="{{ url_for('about') }}">About</a></nav>
+        <h1 class="page-title">Contact</h1>
+        <div class="about-text">
+            <p>Have a question or just want to say hello? Get in touch by email.</p>
+            <p><a class="card-link" href="mailto:hello@example.com">hello@example.com</a></p>
+        </div>
+    </main>
+</body>
+</html>
