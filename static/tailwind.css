@@ -46,6 +46,15 @@
     .link-metadata {
         @apply grid w-full min-w-0 gap-4 text-sm sm:grid-cols-3;
     }
+    .link-card-missing-metadata {
+        @apply border-dashed border-amber-400 bg-amber-50;
+    }
+    .preview-status {
+        @apply w-full text-sm font-semibold text-amber-900;
+    }
+    .flash-warning {
+        @apply mb-4 rounded-lg border border-amber-400 bg-amber-50 p-4 text-amber-900;
+    }
     .card-preview {
         @apply w-full min-w-0 space-y-3;
     }

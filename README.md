@@ -21,6 +21,8 @@ python app.py
 
 Visit `http://127.0.0.1:5000`. Replace the placeholder `hello@example.com` in both the displayed text and `mailto:` link in `templates/contact.html` with your contact address. The contact page needs no additional configuration or dependencies.
 
+Set the `SECRET_KEY` environment variable to a stable random secret when deploying so flash messages work across workers and restarts. Local runs generate a temporary key automatically.
+
 ## Dependencies
 
 Install dependencies using `requirements.txt`:

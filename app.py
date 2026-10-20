@@ -1,13 +1,16 @@
 import logging
+import os
+import secrets
 from uuid import uuid4
 
 import requests
 from bs4 import BeautifulSoup
-from flask import Flask, abort, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, redirect, render_template, request, url_for
 
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 
 links = [
     {"name": "Google", "url": "https://www.google.com"},
@@ -50,8 +53,9 @@ def add_link():
     name = request.form["name"]
     url = request.form["url"]
     metadata = fetch_metadata(url)
-    if all(value == "Not Available" for value in metadata.values()):
+    if all(metadata[field] == "Not Available" for field in ("title", "description", "image_url")):
         logging.warning("Metadata could not be retrieved for %s", url)
+        flash("We saved your link but could not retrieve a preview for that URL.", "warning")
     links.append({
         "id": uuid4().hex,
         "name": name,
