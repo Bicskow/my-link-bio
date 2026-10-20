@@ -1,8 +1,11 @@
+import logging
 from uuid import uuid4
 
 import requests
 from bs4 import BeautifulSoup
 from flask import Flask, abort, redirect, render_template, request, url_for
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -21,7 +24,8 @@ def fetch_metadata(url):
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
-    except requests.RequestException:
+    except requests.RequestException as error:
+        logging.warning("Request failed for %s: %s", url, error)
         return metadata
 
     soup = BeautifulSoup(response.content, "html.parser")
@@ -45,12 +49,16 @@ def index():
 def add_link():
     name = request.form["name"]
     url = request.form["url"]
+    metadata = fetch_metadata(url)
+    if all(value == "Not Available" for value in metadata.values()):
+        logging.warning("Metadata could not be retrieved for %s", url)
     links.append({
         "id": uuid4().hex,
         "name": name,
         "url": url,
-        **fetch_metadata(url),
+        **metadata,
     })
+    logging.info("Added new link %s: %s", name, url)
     return redirect(url_for("index"))
 
 
