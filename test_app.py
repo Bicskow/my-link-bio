@@ -102,6 +102,38 @@ class LinkMetadataTests(unittest.TestCase):
         })
         get.assert_not_called()
 
+    @patch("app.requests.get")
+    def test_missing_preview_flashes_warning_once_and_marks_card(self, get):
+        get.side_effect = requests.Timeout("Timed out")
+        response = self.client.post("/add", data={
+            "name": "Offline", "url": "https://example.com"
+        }, follow_redirects=True)
+        page = BeautifulSoup(response.data, "html.parser")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(page.select_one(".flash-warning").text,
+                         "We saved your link but could not retrieve a preview for that URL.")
+        self.assertIn("link-card-missing-metadata", page.select(".link-card")[-1]["class"])
+        self.assertEqual(page.select(".preview-status")[-1].text, "Preview unavailable")
+        self.assertNotIn(b"We saved your link", self.client.get("/").data)
+
+    @patch("app.requests.get")
+    def test_partial_and_full_previews_do_not_flash_warning(self, get):
+        for full in (False, True):
+            with self.subTest(full=full):
+                html = b'<meta property="og:title" content="Example">'
+                if full:
+                    html += b'<meta property="og:description" content="Description"><meta property="og:image" content="https://example.com/image.png">'
+                get.return_value = Mock(content=html)
+                response = self.client.post("/add", data={
+                    "name": "Example", "url": "https://example.com"
+                }, follow_redirects=True)
+                page = BeautifulSoup(response.data, "html.parser")
+                self.assertIsNone(page.select_one(".flash-warning"))
+                card = page.select(".link-card")[-1]
+                self.assertEqual("link-card-missing-metadata" in card["class"], not full)
+                if not full:
+                    self.assertEqual(card.select_one(".preview-status").text, "Preview incomplete")
+
 
 class ErrorPageTests(unittest.TestCase):
     def setUp(self):

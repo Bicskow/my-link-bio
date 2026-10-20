@@ -10,6 +10,9 @@
     <main class="page">
         <nav class="navigation"><a href="{{ url_for('about') }}">About</a> | <a href="{{ url_for('contact') }}">Contact</a></nav>
         <h1 class="page-title">My Links</h1>
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+        <p class="flash-{{ category }}" role="status">{{ message }}</p>
+        {% endfor %}
         <form class="link-form" action="{{ url_for('add_link') }}" method="post">
             <label for="name">Site name</label>
             <input type="text" id="name" name="name" required>
@@ -19,8 +22,12 @@
         </form>
         <ul class="link-list" aria-label="My links">
             {% for link in links %}
-            <li class="link-card">
                 {% set has_metadata = (link.title and link.title != 'Not Available') or (link.description and link.description != 'Not Available') or (link.image_url and link.image_url != 'Not Available') %}
+                {% set has_full_preview = (link.title and link.title != 'Not Available') and (link.description and link.description != 'Not Available') and (link.image_url and link.image_url != 'Not Available') %}
+            <li class="link-card{% if not has_full_preview %} link-card-missing-metadata{% endif %}">
+                {% if not has_full_preview %}
+                <p class="preview-status">{{ 'Preview incomplete' if has_metadata else 'Preview unavailable' }}</p>
+                {% endif %}
                 {% if has_metadata %}
                 <div class="card-preview">
                     {% if link.image_url and link.image_url != 'Not Available' %}
