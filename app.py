@@ -1,11 +1,12 @@
 import logging
 import os
 import secrets
+from datetime import datetime, timezone
 from uuid import uuid4
 
 import requests
 from bs4 import BeautifulSoup
-from flask import Flask, abort, flash, redirect, render_template, request, url_for
+from flask import Flask, abort, flash, jsonify, redirect, render_template, request, url_for
 
 logging.basicConfig(level=logging.INFO)
 
@@ -46,6 +47,11 @@ def fetch_metadata(url):
 @app.route("/")
 def index():
     return render_template("index.html", links=links)
+
+
+@app.route("/health")
+def health():
+    return jsonify(status="ok", time=datetime.now(timezone.utc).isoformat()), 200
 
 
 @app.route("/add", methods=["POST"])
@@ -107,6 +113,8 @@ def page_not_found(error):
 
 @app.errorhandler(500)
 def internal_server_error(error):
+    if request.endpoint == "health":
+        return jsonify(status="error"), 500
     return render_template("500.html"), 500
 
 
