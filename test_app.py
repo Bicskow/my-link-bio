@@ -1,5 +1,6 @@
 import unittest
 from copy import deepcopy
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 import requests
@@ -133,6 +134,29 @@ class LinkMetadataTests(unittest.TestCase):
                 self.assertEqual("link-card-missing-metadata" in card["class"], not full)
                 if not full:
                     self.assertEqual(card.select_one(".preview-status").text, "Preview incomplete")
+
+
+class HealthCheckTests(unittest.TestCase):
+    def test_health_returns_current_server_time(self):
+        before = datetime.now(timezone.utc)
+        response = app.test_client().get("/health")
+        after = datetime.now(timezone.utc)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.is_json)
+        self.assertEqual(response.json["status"], "ok")
+        server_time = datetime.fromisoformat(response.json["time"])
+        self.assertLessEqual(before, server_time)
+        self.assertLessEqual(server_time, after)
+
+    def test_health_exception_returns_json_error(self):
+        with patch.dict(app.config, DEBUG=False, TESTING=False, PROPAGATE_EXCEPTIONS=False):
+            with patch("app.datetime") as clock:
+                clock.now.side_effect = RuntimeError("private error detail")
+                with self.assertLogs(app.logger, level="ERROR"):
+                    response = app.test_client().get("/health")
+        self.assertEqual(response.status_code, 500)
+        self.assertTrue(response.is_json)
+        self.assertEqual(response.json, {"status": "error"})
 
 
 class ErrorPageTests(unittest.TestCase):
